@@ -1,0 +1,29 @@
+name: Github Actions
+run-name: ${{ github.actor }} is running Github Actions 🚀
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  nix-devshell:
+    name: Test nix flake devshell
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v4
+
+    - name: Setup nix
+      uses: cachix/install-nix-action@v27
+
+    - name: Enter nix flake devshell
+      run: nix develop .
+      if: always()
+
+    - name: Linting with luacheck
+      uses: workflow/nix-shell-action@v3
+      with:
+        packages: luajitPackages.luacheck
+        script: |
+          luacheck .
